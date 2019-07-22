@@ -12,6 +12,7 @@ class App {
   constructor(
     nomnoml: Nomnoml,
     codeMirror: CodeMirror,
+    aws: any,
     public metrics: Metrics,
     saveAs: (blob: Blob, name: string) => void,
     throttle: Throttler,
@@ -35,7 +36,7 @@ class App {
 
     var editorElement = this.editor.getWrapperElement()
 
-    this.filesystem = new FileSystem()
+    this.filesystem = new FileSystem(aws)
     var devenv = new DevEnv(editorElement, lineMarker, lineNumbers)
     this.panner = new CanvasPanner(canvasPanner, () => this.sourceChanged(), throttle)
     this.downloader = new DownloadLinks(canvasElement, saveAs)
@@ -49,14 +50,15 @@ class App {
     var reloadStorage = () => {
       lastValidSource = null
       this.filesystem.configureByRoute(location.hash)
-      var source = this.filesystem.storage.read()
-      this.editor.setValue(source || this.defaultSource)
-      metrics.track('load', {
-        storage: this.filesystem.storage.kind,
-        chars: source.length,
-        lines: source.split('\n').length
+      this.filesystem.storage.read((source) => {
+        this.editor.setValue(source || this.defaultSource)
+        metrics.track('load', {
+          storage: this.filesystem.storage.kind,
+          chars: source.length,
+          lines: source.split('\n').length
+        })
+        this.sourceChanged()
       })
-      this.sourceChanged()
     }
 
     window.addEventListener('hashchange', () => reloadStorage());

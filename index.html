@@ -492,6 +492,7 @@
 
 	<script src="lib/underscore.min.js"></script>
 	<script src="lib/filesaver.min.js"></script>
+	<script src="https://sdk.amazonaws.com/js/aws-sdk-2.492.0.min.js"></script>
 	<script src="codemirror/codemirror-compressed.js"></script>
 	<script src="codemirror/nomnoml.codemirror-mode.js"></script>
 	<script src="dist/nomnoml.web.js"></script>
@@ -501,7 +502,7 @@
 	
 	<script>
 		var metrics = isNomnomlDomain ? mixpanel : { track: console.log.bind(console) }
-		var app = new App(nomnoml, CodeMirror, metrics, saveAs, _.throttle, _.debounce)
+		var app = new App(nomnoml, CodeMirror, AWS, metrics, saveAs, _.throttle, _.debounce)
 		ExportMenu('[export-menu]', app)
 		FileMenu('[file-menu]', app)
 		StorageTools('.storage-tools', app)
